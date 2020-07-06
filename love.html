@@ -8,16 +8,6 @@ body{
   overflow: hidden;
   margin: 0;
 }
-.c1{
-  width: 200px;
-  height: 200px;
-  border: 3px solid white;
-  border-radius: 50%;
-  overflow: hidden;
-}
-img{
-  width: 100%;
-}
 h1{
   position: fixed;
   top: 50%;
@@ -36,11 +26,7 @@ h1 span{
 </style>
 </head>
 <body>
-<h1 id="h1">
-  <div class="c1">
-    <img src="baby.jpeg" alt="">
-  </div>
-</h1>
+<h1 id="h1"></h1>
 <canvas></canvas> 
 <script>
 var canvas = document.querySelector("canvas"),
@@ -151,7 +137,7 @@ window.onload=function starttime(){
         var second = parseInt(time%60);  // 以60秒为一整份 取余 剩下秒数
 //              console.log(hour+":"+minute+":"+second)
 //              alert(hour)
-        obj.innerHTML="苗苗<br>咱俩在一起的时间已经：<br>"+day+"天"+hour+"小时"+minute+"分"+second+"秒"+"了<br><span>我的瞳眸，是江湖而至小<br>石焱</span>"
+        obj.innerHTML="<img src="baby.jpeg" alt="">苗苗<br>咱俩在一起的时间已经：<br>"+day+"天"+hour+"小时"+minute+"分"+second+"秒"+"了<br><span>我的瞳眸，是江湖而至小<br>石焱</span>"
         return true;
     }
 </script>
