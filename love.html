@@ -1,54 +1,130 @@
-<!--https://www.mycodes.net/146/7166.htm-->
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-<meta charset="UTF-8" />
-<title>我们的照片墙</title>
-<meta name="author" content="Codrops" />
-<link rel="stylesheet" type="text/css" href="css/style.css" />
+<meta charset="utf-8">
+<title>love</title>
+<style>
+body{
+  overflow: hidden;
+  margin: 0;
+}
+h1{
+  position: fixed;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  transform:translateY(-50%);
+  font-family: 'Love Ya Like A Sister', cursive;
+  font-size: 40px;
+  color: #000;
+  padding: 0 20px;
+}
+h1 span{
+    font-size:20px;
+}
+</style>
 </head>
 <body>
-<div class="content">
-  <center>
-    <br>
-    <br>
-    <!---<b>苗苗<br />-->
-    </b>
-  </center>
-  <header> </header>
-  <div class="iw_wrapper">
-    <ul class="iw_thumbs" id="iw_thumbs">
-      <li><img src="thumbs/1.jpg" data-img="full/1.jpg"/>
-      </li>
-      <li><img src="thumbs/2.jpg" data-img="full/2.jpg"/>
-      </li>
-      <li><img src="thumbs/3.jpg" data-img="full/3.jpg"/>
-      </li>
-      <li><img src="thumbs/4.jpg" data-img="full/4.jpg"/>
-      </li>
-      <li><img src="thumbs/5.jpg" data-img="full/5.jpg"/>
-      </li>
-      <li><img src="thumbs/6.jpg" data-img="full/6.jpg"/>
-      </li>
-      <li><img src="thumbs/7.jpg" data-img="full/7.jpg"/>
-      </li>
-       <li><img src="thumbs/8.jpg" data-img="full/8.jpg"/>
-      </li>
-      <li><img src="thumbs/9.jpg" data-img="full/9.jpg"/>
-      </li>
-      <li><img src="thumbs/10.jpg" data-img="full/10.jpg"/>
-      </li>
-    </ul>
-  </div>
-  <div id="iw_ribbon" class="iw_ribbon"> <span class="iw_close"></span> <span class="iw_zoom">查看原图</span> </div>
-</div>
-<div class="footer"> <a id='h1' class="left" target="_blank"></a> <a target="_blank"><strong>石焱</strong></a></div>
+<h1 id="h1"></h1>
+<canvas></canvas> 
 <script>
-  
-  window.onload=function starttime(){
-            time(h1,'2020/4/20');     // 在一起的时间
-            ptimer = setTimeout(starttime,1000); // 添加计时器
+var canvas = document.querySelector("canvas"),
+  ctx = canvas.getContext("2d");
+// 声明变量，保存浏览器的高度和宽度
+var ww,wh;
+function onResize(){
+  ww = canvas.width = window.innerWidth;
+  wh = canvas.height = window.innerHeight;
+}
+// ctx.strokeStyle = "green";//strokeStyle返回用于逼出的颜色，渐变或模式
+ctx.shadowBlur = 25;
+// HSLA(H,S,L,A) 的参数说明：
+// H：Hue(色调)。0(或360)表示红色，120表示绿色，240表示蓝色，也可取其他数值来指定颜色。取值为：0 - 360 
+// S：Saturation(饱和度)。取值为：0.0% - 100.0% 
+// L：Lightness(亮度)。取值为：0.0% - 100.0% 
+// A：Alpha透明度。取值0~1之间。  
+ctx.shadowColor = "hsla(0, 100%, 60%,0.5)";
+var precision = 100;
+var hearts = [];
+var mouseMoved = false;
+function onMove(e){
+  mouseMoved = true;
+  // e.type返回时间类型
+  if(e.type === "touchmove"){
+    hearts.push(new Heart(e.touches[0].clientX, e.touches[0].clientY));
+    hearts.push(new Heart(e.touches[0].clientX, e.touches[0].clientY));
+  }
+  else{
+    hearts.push(new Heart(e.clientX, e.clientY));
+    hearts.push(new Heart(e.clientX, e.clientY));
+  }
+}
+var Heart = function(x,y){
+  this.x = x || Math.random()*ww;
+  this.y = y || Math.random()*wh;
+  this.size = Math.random()*2 + 1;
+  this.shadowBlur = Math.random() * 10;
+  this.speedX = (Math.random()+0.2-0.6) * 8;
+  this.speedY = (Math.random()+0.2-0.6) * 8;
+  this.speedSize = Math.random()*0.05 + 0.01;
+  this.opacity = 1;
+  this.vertices = [];
+  for (var i = 0; i < precision; i++) {
+    var step = (i / precision - 0.5) * (Math.PI * 2);
+    var vector = {
+      x : (15 * Math.pow(Math.sin(step), 3)),
+      y : -(13 * Math.cos(step) - 5 * Math.cos(2 * step) - 2 * Math.cos(3 * step) - Math.cos(4 * step)) 
     }
+    this.vertices.push(vector);
+  }
+}
+Heart.prototype.draw = function(){
+  this.size -= this.speedSize;
+  this.x += this.speedX;
+  this.y += this.speedY;
+  ctx.save();
+  // 转换context.translate(x,y);添加到水平坐标x上的值为-1000，添加到垂直坐标y上的值为y
+  ctx.translate(-1000,this.y);
+  ctx.scale(this.size, this.size);
+  // 路径
+  ctx.beginPath();
+  for (var i = 0; i < precision; i++) {
+    var vector = this.vertices[i];
+    ctx.lineTo(vector.x, vector.y);
+  }
+  ctx.globalAlpha = this.size;
+  ctx.shadowBlur = Math.round((3 - this.size) * 10);
+  ctx.shadowColor = "hsla(0, 100%, 60%,0.5)";
+  ctx.shadowOffsetX = this.x + 1000;
+  ctx.globalCompositeOperation = "screen"
+  ctx.closePath();
+  ctx.fill()
+  ctx.restore();
+};
+function render(a){
+  requestAnimationFrame(render);
+
+  hearts.push(new Heart())
+  ctx.clearRect(0,0,ww,wh);
+  for (var i = 0; i < hearts.length; i++) {
+    hearts[i].draw();
+    if(hearts[i].size <= 0){
+      hearts.splice(i,1);
+      i--;
+    }
+  }
+}
+onResize();
+window.addEventListener("mousemove", onMove);
+window.addEventListener("touchmove", onMove);
+window.addEventListener("resize", onResize);
+requestAnimationFrame(render);
+
+window.onload=function starttime(){
+        time(h1,'2020,4,20');     // 在一起的时间
+        ptimer = setTimeout(starttime,1000); // 添加计时器
+}
 
     function time(obj,futimg){
         var nowtime = new Date().getTime(); // 现在时间转换为时间戳
@@ -61,310 +137,10 @@
         var second = parseInt(time%60);  // 以60秒为一整份 取余 剩下秒数
 //              console.log(hour+":"+minute+":"+second)
 //              alert(hour)
-        obj.innerHTML="苗苗,咱们在一起"+day+"天"+hour+"小时"+minute+"分"+second+"秒"+"了"
+        obj.innerHTML="苗苗<br>咱俩在一起的时间已经：<br>"+day+"天"+hour+"小时"+minute+"分"+second+"秒"+"了<br><span><br>我想对你做<br>春天在樱桃树上做的事<br>石焱</span>"
         return true;
     }
 </script>
-<script src="js/jquery.min.js" type="text/javascript"></script>
-<script type="text/javascript" src="js/jquery.masonry.min.js"></script>
-<script type="text/javascript" src="js/jquery.easing.1.3.js"></script>
-<script type="text/javascript">
-			$(window).load(function(){
-				var $iw_thumbs			= $('#iw_thumbs'),
-					$iw_ribbon			= $('#iw_ribbon'),
-					$iw_ribbon_close	= $iw_ribbon.children('span.iw_close'),
-					$iw_ribbon_zoom		= $iw_ribbon.children('span.iw_zoom');
-					
-					ImageWall	= (function() {
-							// window width and height
-						var w_dim,
-						    // index of current image
-							current				= -1,
-							isRibbonShown		= false,
-							isFullMode			= false,
-							// ribbon / images animation settings
-							ribbonAnim			= {speed : 500, easing : 'easeOutExpo'},
-							imgAnim				= {speed : 400, easing : 'jswing'},
-							// init function : call masonry, calculate window dimentions, initialize some events
-							init				= function() {
-								$iw_thumbs.imagesLoaded(function(){
-									$iw_thumbs.masonry({
-										isAnimated	: true
-									});
-								});
-								getWindowsDim();
-								initEventsHandler();
-							},
-							// calculate window dimentions
-							getWindowsDim		= function() {
-								w_dim = {
-									width	: $(window).width(),
-									height	: $(window).height()
-								};
-							},
-							// initialize some events
-							initEventsHandler	= function() {
-								
-								// click on a image
-								$iw_thumbs.delegate('li', 'click', function() {
-									if($iw_ribbon.is(':animated')) return false;
-									
-									var $el = $(this);
-									
-									if($el.data('ribbon')) {
-										showFullImage($el);
-									}
-									else if(!isRibbonShown) {
-										isRibbonShown = true;
-										
-										$el.data('ribbon',true);
-										
-										// set the current
-										current = $el.index();
-									
-										showRibbon($el);
-									}
-								});
-								
-								// click ribbon close
-								$iw_ribbon_close.bind('click', closeRibbon);
-								
-								// on window resize we need to recalculate the window dimentions
-								$(window).bind('resize', function() {
-											getWindowsDim();
-											if($iw_ribbon.is(':animated'))
-												return false;
-											closeRibbon();
-										 })
-								         .bind('scroll', function() {
-											if($iw_ribbon.is(':animated'))
-												return false;
-											closeRibbon();
-										 });
-								
-							},
-							showRibbon			= function($el) {
-								var	$img	= $el.children('img'),
-									$descrp	= $img.next();
-								
-								// fadeOut all the other images
-								$iw_thumbs.children('li').not($el).animate({opacity : 0.2}, imgAnim.speed);
-								
-								// increase the image z-index, and set the height to 100px (default height)
-								$img.css('z-index', 100)
-									.data('originalHeight',$img.height())
-									.stop()
-									.animate({
-										height 		: '100px'
-									}, imgAnim.speed, imgAnim.easing);
-								
-								// the ribbon will animate from the left or right
-								// depending on the position of the image
-								var ribbonCssParam 		= {
-										top	: $el.offset().top - $(window).scrollTop() - 6 + 'px'
-									},
-									descriptionCssParam,
-									dir;
-								
-								if( $el.offset().left < (w_dim.width / 2) ) {
-									dir = 'left';
-									ribbonCssParam.left 	= 0;
-									ribbonCssParam.right 	= 'auto';
-								}
-								else {
-									dir = 'right';
-									ribbonCssParam.right 	= 0;
-									ribbonCssParam.left 	= 'auto';
-								}
-								
-								$iw_ribbon.css(ribbonCssParam)
-								          .show()
-										  .stop()
-										  .animate({width : '100%'}, ribbonAnim.speed, ribbonAnim.easing, function() {
-												switch(dir) {
-													case 'left' :
-														descriptionCssParam		= {
-															'left' 			: $img.outerWidth(true) + 'px',
-															'text-align' 	: 'left'
-														};
-														break;
-													case 'right' :	
-														descriptionCssParam		= {
-															'left' 			: '-200px',
-															'text-align' 	: 'right'
-														};
-														break;
-												};
-												$descrp.css(descriptionCssParam).fadeIn();
-												// show close button and zoom
-												$iw_ribbon_close.show();
-												$iw_ribbon_zoom.show();
-										  });
-								
-							},
-							// close the ribbon
-							// when in full mode slides in the middle of the page
-							// when not slides left
-							closeRibbon			= function() {
-								isRibbonShown 	= false
-								
-								$iw_ribbon_close.hide();
-								$iw_ribbon_zoom.hide();
-								
-								if(!isFullMode) {
-								
-									// current wall image
-									var $el	 		= $iw_thumbs.children('li').eq(current);
-									
-									resetWall($el);
-									
-									// slide out ribbon
-									$iw_ribbon.stop()
-											  .animate({width : '0%'}, ribbonAnim.speed, ribbonAnim.easing); 
-										  
-								}
-								else {
-									$iw_ribbon.stop().animate({
-										opacity		: 0.8,
-										height 		: '0px',
-										marginTop	: w_dim.height/2 + 'px' // half of window height
-									}, ribbonAnim.speed, function() {
-										$iw_ribbon.css({
-											'width'		: '0%',
-											'height'	: '126px',
-											'margin-top': '0px'
-										}).children('img').remove();
-									});
-									
-									isFullMode	= false;
-								}
-							},
-							resetWall			= function($el) {
-								var $img		= $el.children('img'),
-									$descrp		= $img.next();
-									
-								$el.data('ribbon',false);
-								
-								// reset the image z-index and height
-								$img.css('z-index',1).stop().animate({
-									height 		: $img.data('originalHeight')
-								}, imgAnim.speed,imgAnim.easing);
-								
-								// fadeOut the description
-								$descrp.fadeOut();
 
-								// fadeIn all the other images
-								$iw_thumbs.children('li').not($el).animate({opacity : 1}, imgAnim.speed);								
-							},
-							showFullImage		= function($el) {
-								isFullMode	= true;
-								
-								$iw_ribbon_close.hide();
-								
-								var	$img	= $el.children('img'),
-									large	= $img.data('img'),
-								
-									// add a loading image on top of the image
-									$loading = $('<span class="iw_loading"></span>');
-								
-								$el.append($loading);
-								
-								// preload large image
-								$('<img/>').load(function() {
-									var $largeImage	= $(this);
-									
-									$loading.remove();
-									
-									$iw_ribbon_zoom.hide();
-									
-									resizeImage($largeImage);
-									
-									// reset the current image in the wall
-									resetWall($el);
-									
-									// animate ribbon in and out
-									$iw_ribbon.stop().animate({
-										opacity		: 1,
-										height 		: '0px',
-										marginTop	: '63px' // half of ribbons height
-									}, ribbonAnim.speed, function() {
-										// add the large image to the DOM
-										$iw_ribbon.prepend($largeImage);
-										
-										$iw_ribbon_close.show();
-										
-										$iw_ribbon.animate({
-											height 		: '100%',
-											marginTop	: '0px',
-											top			: '0px'
-										}, ribbonAnim.speed);
-									});
-								}).attr('src',large);
-									
-							},
-							resizeImage			= function($image) {
-								var widthMargin		= 100,
-									heightMargin 	= 100,
-								
-									windowH      	= w_dim.height - heightMargin,
-									windowW      	= w_dim.width - widthMargin,
-									theImage     	= new Image();
-									
-								theImage.src     	= $image.attr("src");
-								
-								var imgwidth     	= theImage.width,
-									imgheight    	= theImage.height;
-
-								if((imgwidth > windowW) || (imgheight > windowH)) {
-									if(imgwidth > imgheight) {
-										var newwidth 	= windowW,
-											ratio 		= imgwidth / windowW,
-											newheight 	= imgheight / ratio;
-											
-										theImage.height = newheight;
-										theImage.width	= newwidth;
-										
-										if(newheight > windowH) {
-											var newnewheight 	= windowH,
-												newratio 		= newheight/windowH,
-												newnewwidth 	= newwidth/newratio;
-										
-											theImage.width 		= newnewwidth;
-											theImage.height		= newnewheight;
-										}
-									}
-									else {
-										var newheight 	= windowH,
-											ratio 		= imgheight / windowH,
-											newwidth 	= imgwidth / ratio;
-										
-										theImage.height = newheight;
-										theImage.width	= newwidth;
-										
-										if(newwidth > windowW) {
-											var newnewwidth 	= windowW,
-											    newratio 		= newwidth/windowW,
-												newnewheight 	= newheight/newratio;
-									
-											theImage.height 	= newnewheight;
-											theImage.width		= newnewwidth;
-										}
-									}
-								}
-									
-								$image.css({
-									'width'			: theImage.width + 'px',
-									'height'		: theImage.height + 'px',
-									'margin-left'	: -theImage.width / 2 + 'px',
-									'margin-top'	: -theImage.height / 2 + 'px'
-								});							
-							};
-							
-						return {init : init};	
-					})();
-				
-				ImageWall.init();
-			});
-		</script>
 </body>
 </html>
